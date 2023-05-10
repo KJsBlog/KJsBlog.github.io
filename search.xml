@@ -15,10 +15,12 @@
 <li>分析：</li>
 </ol>
 <p>对于这两个小函数，看似在实现的逻辑上是一致的：都是把dst[i][j]值赋值给src[i][j]的值，但是在具体的代码实现上。却是相差了20倍!</p>
-<p><img src="/KJblog.github.io/KJblog.github.io/2023/05/07/CSAPP-Lesson-1/CSAPP-Lesson-1/Lesson%201%20question.png" alt="图片来自B站UP主 刘迪望 的转载视频"></p>
+<img src="https://s2.loli.net/2023/05/10/sBdKATDCnHaQIxl.png" alt="Lesson 1 question.png">
+
 <p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size="1">图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
 <hr>
-<p><img src="/KJblog.github.io/KJblog.github.io/2023/05/07/CSAPP-Lesson-1/CSAPP-Lesson-1/Lesson%201%20explanation.png" alt="图片来自B站UP主 刘迪望 的转载视频"></p>
+<img src="https://s2.loli.net/2023/05/10/Ql5vHAE4mKo9cqw.png" alt="Lesson 1 explanation.png">
+
 <p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size="1">图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
 <hr>
 <ol start="3">
@@ -26,7 +28,8 @@
 </ol>
 <p><font size="2">总结：Lesson 1是开课的第一节，大概地讲授了课程的重要性以及课程的大概安排，其中的这个问题让我产生了思考，但因为写下这些的时候，笔者仅仅是刚开始的小白，而这也只是一个现在自己的猜测，同时也是写给未来的自己看的。所以在语言以及思考上都是有不足的。</font></p>
 <p><font face="楷体"><del>个人的猜想：笔者个人认为之所以产生这样的差距是因为二维数组在储存方式上的特点所导致的:二维数组的储存是先固定第一位再排序第二位（即先固定array[i][j]中的i，然后再进行j的输入）。</del></font></p>
-<p><img src="/KJblog.github.io/KJblog.github.io/2023/05/07/CSAPP-Lesson-1/CSAPP-Lesson-1/Answer%20about%20array.png"></p>
+<img src="https://s2.loli.net/2023/05/10/OUK7bZvfzFwgB9l.png" alt="Answer about array">
+
 <p><font face="隶书" size="1">这个是来自我的猜想，看看学成归来会有什么新的体会以及修正</font></p>
 ]]></content>
       <categories>
