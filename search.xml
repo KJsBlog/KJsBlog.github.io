@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Hello world</title>
-    <url>/KJsBlog/KJblog.github.io.git/2023/05/07/hello-world/</url>
+    <url>/KJblog.github.io/2023/05/07/hello-world/</url>
     <content><![CDATA[<table><tr><td bgcolor=#f7ff05><font size = 10 face ="黑体" color = "red">破壳第一天</font></td></tr></table>
 
 <p>欢迎来到<font size =4 color = "orange">KJ</font>的博客世界，我将会在这里更新有关于计算机的知识以及日常的生活，欢迎大家来看我的blog。</p>
@@ -10,7 +10,7 @@
   </entry>
   <entry>
     <title>CSAPP Lesson 1</title>
-    <url>/KJsBlog/KJblog.github.io.git/2023/05/07/CSAPP-Lesson-1/</url>
+    <url>/KJblog.github.io/2023/05/07/CSAPP-Lesson-1/</url>
     <content><![CDATA[<h1 id="Gist-of-Lesson-1"><a href="#Gist-of-Lesson-1" class="headerlink" title="Gist of Lesson 1"></a><strong>Gist of Lesson 1</strong></h1><hr>
 <p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p>
 <h2 id="Lesson-1"><a href="#Lesson-1" class="headerlink" title="Lesson 1"></a>Lesson 1</h2><p>今天看CSAPP的第一课，虽然中间的大部分时间是讲学术诚信，对于我个上网课的没什么启发，但其中教授抛出的一个问题还是很适合我的思考，这里写下来，希望在学成之后对这个问题能有更好的理解。</p>
@@ -23,10 +23,13 @@
 <li>分析：</li>
 </ol>
 <p>对于这两个小函数，看似在实现的逻辑上是一致的：都是把dst[i][j]值赋值给src[i][j]的值，但是在具体的代码实现上。却是相差了20倍!</p>
-<p><img src="/KJsBlog/KJblog.github.io.git/./pictures/Lesson%201%20question.png" alt="图片来自B站UP主 刘迪望 的转载视频"></p>
+<img src="./pictures/CSAPP_Lesson_1/Lesson 1 question.png" >
+
 <p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
 <hr>
-<p><img src="/KJsBlog/KJblog.github.io.git/./pictures/Lesson%201%20explanation.png" alt="图片来自B站UP主 刘迪望 的转载视频"></p>
+<img src="./pictures/CSAPP_Lesson_1/Lesson 1 explanation.png" >
+
+
 <p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
 <hr>
 <ol start="3">
@@ -34,8 +37,8 @@
 </ol>
 <p><font size = 2>总结：Lesson 1是开课的第一节，大概地讲授了课程的重要性以及课程的大概安排，其中的这个问题让我产生了思考，但因为写下这些的时候，笔者仅仅是刚开始的小白，而这也只是一个现在自己的猜测，同时也是写给未来的自己看的。所以在语言以及思考上都是有不足的。</p>
 <p><font face="楷体"><del>个人的猜想：笔者个人认为之所以产生这样的差距是因为二维数组在储存方式上的特点所导致的:二维数组的储存是先固定第一位再排序第二位（即先固定array[i][j]中的i，然后再进行j的输入）。</del></font></font></p>
-<p><img src="/KJsBlog/KJblog.github.io.git/./pictures/Answer%20about%20array.png"><br><font face ="隶书" size = 1>这个是来自我的猜想，看看学成归来会有什么新的体会以及修正</font></p>
-]]></content>
+<img src="./pictures/CSAPP_Lesson_1/Answer about array.png" >
+<font face ="隶书" size = 1>这个是来自我的猜想，看看学成归来会有什么新的体会以及修正</font>]]></content>
       <categories>
         <category>CSAPP</category>
       </categories>
