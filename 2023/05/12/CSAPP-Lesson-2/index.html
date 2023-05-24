@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>CSAPP-Lesson-2 | KJ's Blog</title><meta name="author" content="LKJ"><meta name="copyright" content="LKJ"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Gist of Lesson 2 摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于边学边看的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历 Lesson 2 1.字长对于一位pwn手而言，在面对不同的程序进行攻击时，第一件关心的事情就是它是几位的程序（即其字长是多">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSAPP-Lesson-2">
+<meta property="og:url" content="https://kjsblog.github.io/2023/05/12/CSAPP-Lesson-2/index.html">
+<meta property="og:site_name" content="KJ&#39;s Blog">
+<meta property="og:description" content="Gist of Lesson 2 摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于边学边看的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历 Lesson 2 1.字长对于一位pwn手而言，在面对不同的程序进行攻击时，第一件关心的事情就是它是几位的程序（即其字长是多">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2023/05/10/nst5hOMpazHWK1q.jpg">
+<meta property="article:published_time" content="2023-05-12T11:40:26.000Z">
+<meta property="article:modified_time" content="2023-05-24T10:20:41.542Z">
+<meta property="article:author" content="LKJ">
+<meta property="article:tag" content="CSAPP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2023/05/10/nst5hOMpazHWK1q.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://kjsblog.github.io/2023/05/12/CSAPP-Lesson-2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":100,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"距博主发布该文已有","messageNext":"天，文章内容可能因技术迭代等原因过期，仅供参考"},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":150},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":30,"languages":{"author":"作者: LKJ","link":"链接: ","source":"来源: KJ's Blog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CSAPP-Lesson-2',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-05-24 18:20:41'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = 'hidden';
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+
+preloader.initLoading()
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (false) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/image.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://kj165.lofter.com/"><i class="fa-fw fas fa-camera"></i><span> 摄影</span></a></div><div class="menus_item"><a class="site-page" href="/guestbook/"><i class="fa-fw fa fa-book"></i><span> 留言</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s2.loli.net/2023/05/10/nst5hOMpazHWK1q.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="KJ's Blog"><span class="site-name">KJ's Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://kj165.lofter.com/"><i class="fa-fw fas fa-camera"></i><span> 摄影</span></a></div><div class="menus_item"><a class="site-page" href="/guestbook/"><i class="fa-fw fa fa-book"></i><span> 留言</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">CSAPP-Lesson-2</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-05-12T11:40:26.000Z" title="发表于 2023-05-12 19:40:26">2023-05-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-05-24T10:20:41.542Z" title="更新于 2023-05-24 18:20:41">2023-05-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CSAPP/">CSAPP</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/2023/05/12/CSAPP-Lesson-2/" data-flag-title="CSAPP-Lesson-2"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Gist-of-Lesson-2"><a href="#Gist-of-Lesson-2" class="headerlink" title="Gist of Lesson 2"></a><strong>Gist of Lesson 2</strong></h1><hr>
+<p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p>
+<h2 id="Lesson-2"><a href="#Lesson-2" class="headerlink" title="Lesson 2"></a>Lesson 2</h2><hr>
+<h3 id="1-字长"><a href="#1-字长" class="headerlink" title="1.字长"></a>1.字长</h3><p>对于一位pwn手而言，在面对不同的程序进行攻击时，第一件关心的事情就是它是几位的程序（即其字长是多少）。所以对不同位数的程序，不同的字长就意味着你应该覆盖多长字节的数据。<br>这是摘自百度的解释：</p>
+<p><code>字长是CPU的主要技术指标之一，指的是CPU一次能并行处理的二进制位数，字长总是8的整数倍，通常PC机的字长为16位（早期），32位，64位。</code></p>
+<h2 id="这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：图片来自B站UP主-刘迪望-的转载视频"><a href="#这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：图片来自B站UP主-刘迪望-的转载视频" class="headerlink" title="这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：图片来自B站UP主 刘迪望 的转载视频"></a>这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：<br><img src="https://s2.loli.net/2023/05/12/6GspVDlKqwFMncU.png" alt="CSAPP字长"><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></h2><h3 id="2-不同操作运算符的理解"><a href="#2-不同操作运算符的理解" class="headerlink" title="2.不同操作运算符的理解"></a>2.不同操作运算符的理解</h3><p>在这一段中，我们看到了不同运算符在集合中的用法<br><img src="https://s2.loli.net/2023/05/12/gPukATaMKCS81ym.png" alt="CSAPP运算符的理解"><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<p>基本四种运算符：<font size =4 color = orange>&amp;</font>（and）运算符是集合的交运算； <font size =4 color = orange>|</font>（or）运算符是集合的并运算； <font size =4 color = orange>^</font>（X-or）运算符是集合的对称差运算,而最后<font size =4 color = orange>~</font>运算符是集合的补集。其实这里让我想到了汇编指令中一般清零一个变量一般都不会用<code>mov rax 0</code>这样去清零，一般都是利用<code>xor rax rax</code>异或运算经行清零，这样会比直接赋值快。<br>然而正当我百度去看看异或还有什么骚操作时，果真还有：</p>
+<hr>
+<p>异或骚操作：<br>摘录自：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_27010489/article/details/117190163">https://blog.csdn.net/weixin_27010489/article/details/117190163</a></p>
+<p><FONT face = 楷体 >能不能不引入其他变量就可以实现变量值的交换呢？答案是肯定的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="type">int</span> a,b;</span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d %d&quot;</span>,&amp;a,&amp;b);</span><br><span class="line">a = a^b; <span class="comment">//(1)</span></span><br><span class="line">b = a^b; <span class="comment">//(2)</span></span><br><span class="line">a = a^b; <span class="comment">//(3)</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d %d\n&quot;</span>,a,b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>证明如下：</p>
+<p>前提条件：异或操作满足结合律和交换律，且由异或操作的性质知道，对于任意一个整数a^a&#x3D;0；</p>
+<p>证：(第(2)步中的a) a &#x3D; a^b &#x3D; (将第(1)步中的b代入b) a^(a^b) &#x3D; b;</p>
+<p>(第(3)步中的b)b &#x3D; a^b &#x3D; (将第(1)步中的b代入b，将第(2)步中的a代入a) a^b^a^a^b &#x3D; a^a^a^b^b &#x3D; a;</p>
+<h2 id="证毕（优雅，真的太优雅了）"><a href="#证毕（优雅，真的太优雅了）" class="headerlink" title="证毕（优雅，真的太优雅了）"></a>证毕（优雅，真的太优雅了）</FONT><img src =https://s2.loli.net/2023/05/12/OGCgRKjlSpIXvid.jpg width = 300></img></h2><p>小贴士：<br><img src = https://s2.loli.net/2023/05/12/ljK7qSfWre6y9s4.png tal = 空指针的判断><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<p>（这个空指针的判断也同样的优雅，如果地址p或者是p的值是空的直接成0，然后就是短路）真的太棒了（但是漏洞利用的姿势又少了&#x2F;(ㄒoㄒ)&#x2F;~~）</p>
+<hr>
+<h3 id="3-补码"><a href="#3-补码" class="headerlink" title="3.补码"></a>3.补码</h3><p>这里对补码的讲述个人认为实在是通透精彩。以往我们的课本只会讲补码是怎么转换，但并没有讲其实际的意义（也有可能讲的时候我开小差了吧(●’◡’●)）。</p>
+<p>在讲补码运算之前，先把补码范围的图放一下：<br><IMG SRC = https://s2.loli.net/2023/05/15/oAE2Th4SrXQgbpd.png></p>
+<p><FONT SIZE = 2 FACE = "楷体">请大家仔细阅读上面的这张图片，会更好的帮助你理解补码的表示。</FONT></p>
+<p>我又参考了一下国内的教材，好像是利用钟表这个比喻来解释补码是什么：</p>
+<p>个人参考了这篇博客，个人觉得讲的还是挺通俗的。（<a target="_blank" rel="noopener" href="https://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html%EF%BC%89">https://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html）</a></p>
+<p>在CMU课堂上，老师利用了一个更容易理解的方式来告诉我们一个补码到底是如何表示一个负数，这里是我的一点总结，如果想学的更细的小伙伴可以去看<a herf = "https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click">CMU的原视频</a></p>
+<img src = https://s2.loli.net/2023/05/15/Uai2s9ynRPzEJxq.png>
+
+<p>当一个n位二进制数是以补码形式表示时，其最高位n已经不再表示为2^（n-1），而是表示为-（2^（n-1）），然后再进行转换。</p>
+<hr>
+<h3 id="4-unsigned和signed数字的处理"><a href="#4-unsigned和signed数字的处理" class="headerlink" title="4.unsigned和signed数字的处理"></a>4.unsigned和signed数字的处理</h3><p>Rules：在进行两个数的大小比较时，如果两个数的类型不一样（一个是signed，另一个是unsigned）那么要将符号数转化位无符号数再进行操作。</p>
+<p>这里利用一个小程序帮助大家进行理解：<br><IMG SRC = https://s2.loli.net/2023/05/15/t5ihFkmrE1cMlbe.png></p>
+<p>如果从我们大家理解的角度下看a&#x3D;-1，b&#x3D;0，在进行a &lt; b 的比较时，应该是返回1（表示正确的），但这里却显示为0。这里就很好的展示了unsigned和signed之间的转换。</p>
+<p>对于signed int a而言，其表示为1111 1111</p>
+<p>对于unsigned int b而言，其表示为0000 0000</p>
+<p>此时进行a、b之间的比较，因为他们类型不同，所以把signed int当成unsigned进行比较，很明显，此时对于a（1111 1111）是为unsigned int中的最大值。所以1111 1111 &lt; 0000 0000是错误的，所以返回值为0。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://kjsblog.github.io/KJblog.github.io/">LKJ</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://kjsblog.github.io/2023/05/12/CSAPP-Lesson-2/">https://kjsblog.github.io/2023/05/12/CSAPP-Lesson-2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">知识共享 署名 4.0 国际 许可协议</a> 许可协议。转载请注明来自 <a href="https://kjsblog.github.io" target="_blank">KJ's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CSAPP/">CSAPP</a></div><div class="post_share"><div class="social-share" data-image="https://s2.loli.net/2023/05/10/nst5hOMpazHWK1q.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/05/13/2023LitCTF/" title="2023LitCTF"><img class="cover" src="https://s2.loli.net/2023/05/13/Z94LFjWE6MUdJza.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023LitCTF</div></div></a></div><div class="next-post pull-right"><a href="/2023/05/12/2023VNCTF-traveler/" title="2023VNCTF-traveler"><img class="cover" src="https://s2.loli.net/2023/05/13/Z94LFjWE6MUdJza.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2023VNCTF-traveler</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/05/07/CSAPP-Lesson-1/" title="CSAPP Lesson 1"><img class="cover" src="https://s2.loli.net/2023/05/10/nst5hOMpazHWK1q.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-07</div><div class="title">CSAPP Lesson 1</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/image.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LKJ</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/KJsBlog"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/KJsBlog" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:1049978067@qq.com" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/414876958" target="_blank" title="bilibili"><i class="fab fa-bilibili" style="color: #00BFFF;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">等博主暑假猛更博客(bushi)</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Gist-of-Lesson-2"><span class="toc-text">Gist of Lesson 2</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Lesson-2"><span class="toc-text">Lesson 2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AD%97%E9%95%BF"><span class="toc-text">1.字长</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E6%98%AF%E6%9D%A5%E8%87%AACSAPP%E7%9A%84%E6%88%AA%E5%9B%BE%EF%BC%8C%E6%97%A8%E5%9C%A8%E5%91%8A%E8%AF%89%E6%88%91%E4%BB%AC%E9%9D%A2%E5%AF%B9%E4%B8%8D%E5%90%8C%E7%9A%84%E7%A8%8B%E5%BA%8F%EF%BC%8C%E5%85%B6%E5%8F%98%E9%87%8F%E7%B1%BB%E5%9E%8B%E4%B8%8D%E5%90%8C%E6%97%B6%EF%BC%8C%E5%AF%B9%E5%BA%94%E7%9A%84%E9%95%BF%E5%BA%A6%E4%B8%BA%E5%A4%9A%E5%B0%91%EF%BC%9A%E5%9B%BE%E7%89%87%E6%9D%A5%E8%87%AAB%E7%AB%99UP%E4%B8%BB-%E5%88%98%E8%BF%AA%E6%9C%9B-%E7%9A%84%E8%BD%AC%E8%BD%BD%E8%A7%86%E9%A2%91"><span class="toc-text">这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：图片来自B站UP主 刘迪望 的转载视频</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%B8%8D%E5%90%8C%E6%93%8D%E4%BD%9C%E8%BF%90%E7%AE%97%E7%AC%A6%E7%9A%84%E7%90%86%E8%A7%A3"><span class="toc-text">2.不同操作运算符的理解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%81%E6%AF%95%EF%BC%88%E4%BC%98%E9%9B%85%EF%BC%8C%E7%9C%9F%E7%9A%84%E5%A4%AA%E4%BC%98%E9%9B%85%E4%BA%86%EF%BC%89"><span class="toc-text">证毕（优雅，真的太优雅了）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%A1%A5%E7%A0%81"><span class="toc-text">3.补码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-unsigned%E5%92%8Csigned%E6%95%B0%E5%AD%97%E7%9A%84%E5%A4%84%E7%90%86"><span class="toc-text">4.unsigned和signed数字的处理</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/05/13/2023LitCTF/" title="2023LitCTF"><img src="https://s2.loli.net/2023/05/13/Z94LFjWE6MUdJza.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2023LitCTF"/></a><div class="content"><a class="title" href="/2023/05/13/2023LitCTF/" title="2023LitCTF">2023LitCTF</a><time datetime="2023-05-13T08:18:09.000Z" title="发表于 2023-05-13 16:18:09">2023-05-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/12/CSAPP-Lesson-2/" title="CSAPP-Lesson-2"><img src="https://s2.loli.net/2023/05/10/nst5hOMpazHWK1q.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CSAPP-Lesson-2"/></a><div class="content"><a class="title" href="/2023/05/12/CSAPP-Lesson-2/" title="CSAPP-Lesson-2">CSAPP-Lesson-2</a><time datetime="2023-05-12T11:40:26.000Z" title="发表于 2023-05-12 19:40:26">2023-05-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/12/2023VNCTF-traveler/" title="2023VNCTF-traveler"><img src="https://s2.loli.net/2023/05/13/Z94LFjWE6MUdJza.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2023VNCTF-traveler"/></a><div class="content"><a class="title" href="/2023/05/12/2023VNCTF-traveler/" title="2023VNCTF-traveler">2023VNCTF-traveler</a><time datetime="2023-05-12T00:47:58.000Z" title="发表于 2023-05-12 08:47:58">2023-05-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/07/CSAPP-Lesson-1/" title="CSAPP Lesson 1"><img src="https://s2.loli.net/2023/05/10/nst5hOMpazHWK1q.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CSAPP Lesson 1"/></a><div class="content"><a class="title" href="/2023/05/07/CSAPP-Lesson-1/" title="CSAPP Lesson 1">CSAPP Lesson 1</a><time datetime="2023-05-07T07:56:10.000Z" title="发表于 2023-05-07 15:56:10">2023-05-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/07/hello-world/" title="Hello world"><img src="https://s2.loli.net/2023/05/09/qMPQ4ScXBnsJZoH.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello world"/></a><div class="content"><a class="title" href="/2023/05/07/hello-world/" title="Hello world">Hello world</a><time datetime="2023-05-07T07:56:10.000Z" title="发表于 2023-05-07 15:56:10">2023-05-07</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 By LKJ</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '0GXj8qBeVnGEo2vbtfmLrScr-gzGzoHsz',
+      appKey: 'CjectLisETeiP87luKRxBOcs',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="C,0,R,3" data-fontsize="15px" data-random="false" async="async"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

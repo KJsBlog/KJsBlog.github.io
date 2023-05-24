@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>2023LitCTF</title>
+    <url>/2023/05/13/2023LitCTF/</url>
+    <content><![CDATA[<h1 id="周末参加个Litctf"><a href="#周末参加个Litctf" class="headerlink" title="周末参加个Litctf"></a>周末参加个Litctf</h1><p>然后发现了自己对堆栈的知识还是不太熟练，看来暑假有的忙活的啦。（之前只顾着赶进度，堆理论，没有太注意刷题了，导致看到题目，虽然找到了明显的漏洞，但却不会利用）所以就只做了两道签到题。&#x2F;(ㄒoㄒ)&#x2F;~~</p>
+<h2 id="1-只需要nc一下："><a href="#1-只需要nc一下：" class="headerlink" title="1. 只需要nc一下："></a>1. 只需要nc一下：</h2><p>这道题看上去很简单，实际上也确实很简单。(<code>*^_^*</code>)<br>先按照题目所给提示去nc一下：<br>题目告诉你这是一个虚拟终端，然后一个Dokerfile文件，然后当你cat一下之后看到Dockerfile的内容是把一个flag写入环境变量中：</p>
+<img src = https://s2.loli.net/2023/05/14/yw27A9YJDFbNKWz.png tal = "Dockerfile的内容">
+
+<p>所以使用env命令查看环境变量。直接看到flag：</p>
+<img src = https://s2.loli.net/2023/05/14/NpkiXq6mtJLsQjR.png>
+
+<hr>
+<h2 id="2-口算题卡"><a href="#2-口算题卡" class="headerlink" title="2. 口算题卡"></a>2. 口算题卡</h2><p>这道题是经典的游戏题，只要答对一百道算数题就能得到flag，当然可以使用人肉爆解啦，但作为一个pwn手，肯定不能爆解啦，直接把flag附上：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">io = remote(<span class="string">&#x27;node4.anna.nssctf.cn&#x27;</span>,<span class="number">28634</span>)</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&#x27;fun!\n&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">105</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&#x27;What is &#x27;</span>)</span><br><span class="line">    a=<span class="built_in">int</span>(io.recvuntil(<span class="string">b&#x27; &#x27;</span>,drop=<span class="literal">True</span>))</span><br><span class="line">    operater=io.recvuntil(<span class="string">b&#x27; &#x27;</span>,drop=<span class="literal">True</span>)</span><br><span class="line">    b=<span class="built_in">int</span>(io.recvuntil(<span class="string">b&#x27;?\n&#x27;</span>,drop=<span class="literal">True</span>))</span><br><span class="line">    <span class="keyword">if</span>(operater==<span class="string">b&#x27;+&#x27;</span>):</span><br><span class="line">        ans = a+b</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        ans = a-b</span><br><span class="line">    <span class="built_in">print</span>(ans)</span><br><span class="line">    io.send(<span class="built_in">str</span>(ans).encode())</span><br><span class="line">    io.recvuntil(<span class="string">b&#x27;Correct!\n&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这个还是个比较简单的游戏题，毕竟只有加减法。</p>
+<hr>
+<p>比赛就只写出这两道题了，第三道说实话真不难，但就是出不来，静态调试和动态调试的结果不一样。</p>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>以下纯属个人心里独白，大家可以直接退出了。</p>
+<p>这次是作为网特成员参加的第一次正式的比赛（D3那次就算了，纯属陪跑），但这第一次的出征并不完美，pwn题总体难度其实并不大，但没有ak，只做了两道水题，这个是应该我好好反省的，每天看似忙忙碌碌，最后一比赛，所有的问题都暴露：对于pwntools使用不熟练、python各种变量类型转换不熟悉、局部变量在栈上存储不了解、面对静态和动态调试不相等时的窘迫……其实这与我之前的学习侧重点有关，师兄很早之前就跟我说要多刷点题，但对于刷题我还是并没有太放心上，导致了这次比赛发现了漏洞，却不会利用。但问题暴露了就是个好事，希望下次比赛能拿出自己最好的状态。（暑假的时候也应该好好的刷刷题目）</p>
+]]></content>
+      <categories>
+        <category>pwn学习</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>wp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>2023VNCTF-traveler</title>
     <url>/2023/05/12/2023VNCTF-traveler/</url>
     <content><![CDATA[<h1 id="2023VNCTF-traveler"><a href="#2023VNCTF-traveler" class="headerlink" title="2023VNCTF-traveler"></a><font size = 10 color = 'orange'>2023VNCTF-traveler</font></h1><h2 id="1-题目分析"><a href="#1-题目分析" class="headerlink" title="1.题目分析"></a>1.题目分析</h2><p>首先老传统手艺：checksec一下：<br><img src=https://s2.loli.net/2023/05/12/N1jST5JCWyY793b.png><br>好家伙，就一个栈不可执行，<del>感觉应该不是很难</del>直接拖进IDA逆向看看</p>
@@ -22,15 +49,6 @@
         <tag>pwn</tag>
         <tag>wp</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello world</title>
-    <url>/2023/05/07/hello-world/</url>
-    <content><![CDATA[<table><tr><td bgcolor=#f7ff05><font size = 10 face ="黑体" color = "red">破壳第一天</font></td></tr></table>
-
-<p>欢迎来到<font size =4 color = "orange">KJ</font>的博客世界，我将会在这里更新有关于计算机的知识以及日常的生活，欢迎大家来看我的blog。</p>
-<h1 id="特别鸣谢："><a href="#特别鸣谢：" class="headerlink" title="特别鸣谢："></a><font size = 5 face = 楷体 color = red >特别鸣谢：</font></h1><p>标志设计来自：sea blue blue<br><img src = https://s2.loli.net/2023/05/09/qMPQ4ScXBnsJZoH.png></p>
-]]></content>
   </entry>
   <entry>
     <title>CSAPP Lesson 1</title>
@@ -70,5 +88,59 @@
       <tags>
         <tag>CSAPP</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>CSAPP-Lesson-2</title>
+    <url>/2023/05/12/CSAPP-Lesson-2/</url>
+    <content><![CDATA[<h1 id="Gist-of-Lesson-2"><a href="#Gist-of-Lesson-2" class="headerlink" title="Gist of Lesson 2"></a><strong>Gist of Lesson 2</strong></h1><hr>
+<p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p>
+<h2 id="Lesson-2"><a href="#Lesson-2" class="headerlink" title="Lesson 2"></a>Lesson 2</h2><hr>
+<h3 id="1-字长"><a href="#1-字长" class="headerlink" title="1.字长"></a>1.字长</h3><p>对于一位pwn手而言，在面对不同的程序进行攻击时，第一件关心的事情就是它是几位的程序（即其字长是多少）。所以对不同位数的程序，不同的字长就意味着你应该覆盖多长字节的数据。<br>这是摘自百度的解释：</p>
+<p><code>字长是CPU的主要技术指标之一，指的是CPU一次能并行处理的二进制位数，字长总是8的整数倍，通常PC机的字长为16位（早期），32位，64位。</code></p>
+<h2 id="这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：图片来自B站UP主-刘迪望-的转载视频"><a href="#这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：图片来自B站UP主-刘迪望-的转载视频" class="headerlink" title="这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：图片来自B站UP主 刘迪望 的转载视频"></a>这里是来自CSAPP的截图，旨在告诉我们面对不同的程序，其变量类型不同时，对应的长度为多少：<br><img src="https://s2.loli.net/2023/05/12/6GspVDlKqwFMncU.png" alt="CSAPP字长"><br><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></h2><h3 id="2-不同操作运算符的理解"><a href="#2-不同操作运算符的理解" class="headerlink" title="2.不同操作运算符的理解"></a>2.不同操作运算符的理解</h3><p>在这一段中，我们看到了不同运算符在集合中的用法<br><img src="https://s2.loli.net/2023/05/12/gPukATaMKCS81ym.png" alt="CSAPP运算符的理解"><br><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<p>基本四种运算符：<font size =4 color = orange>&amp;</font>（and）运算符是集合的交运算； <font size =4 color = orange>|</font>（or）运算符是集合的并运算； <font size =4 color = orange>^</font>（X-or）运算符是集合的对称差运算,而最后<font size =4 color = orange>~</font>运算符是集合的补集。其实这里让我想到了汇编指令中一般清零一个变量一般都不会用<code>mov rax 0</code>这样去清零，一般都是利用<code>xor rax rax</code>异或运算经行清零，这样会比直接赋值快。<br>然而正当我百度去看看异或还有什么骚操作时，果真还有：</p>
+<hr>
+<p>异或骚操作：<br>摘录自：<a href="https://blog.csdn.net/weixin_27010489/article/details/117190163">https://blog.csdn.net/weixin_27010489/article/details/117190163</a></p>
+<p><FONT face = 楷体 >能不能不引入其他变量就可以实现变量值的交换呢？答案是肯定的。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="type">int</span> a,b;</span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d %d&quot;</span>,&amp;a,&amp;b);</span><br><span class="line">a = a^b; <span class="comment">//(1)</span></span><br><span class="line">b = a^b; <span class="comment">//(2)</span></span><br><span class="line">a = a^b; <span class="comment">//(3)</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d %d\n&quot;</span>,a,b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>证明如下：</p>
+<p>前提条件：异或操作满足结合律和交换律，且由异或操作的性质知道，对于任意一个整数a^a&#x3D;0；</p>
+<p>证：(第(2)步中的a) a &#x3D; a^b &#x3D; (将第(1)步中的b代入b) a^(a^b) &#x3D; b;</p>
+<p>(第(3)步中的b)b &#x3D; a^b &#x3D; (将第(1)步中的b代入b，将第(2)步中的a代入a) a^b^a^a^b &#x3D; a^a^a^b^b &#x3D; a;</p>
+<h2 id="证毕（优雅，真的太优雅了）"><a href="#证毕（优雅，真的太优雅了）" class="headerlink" title="证毕（优雅，真的太优雅了）"></a>证毕（优雅，真的太优雅了）</FONT><img src =https://s2.loli.net/2023/05/12/OGCgRKjlSpIXvid.jpg width = 300></img></h2><p>小贴士：<br><img src = https://s2.loli.net/2023/05/12/ljK7qSfWre6y9s4.png tal = 空指针的判断><br><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<p>（这个空指针的判断也同样的优雅，如果地址p或者是p的值是空的直接成0，然后就是短路）真的太棒了（但是漏洞利用的姿势又少了&#x2F;(ㄒoㄒ)&#x2F;~~）</p>
+<hr>
+<h3 id="3-补码"><a href="#3-补码" class="headerlink" title="3.补码"></a>3.补码</h3><p>这里对补码的讲述个人认为实在是通透精彩。以往我们的课本只会讲补码是怎么转换，但并没有讲其实际的意义（也有可能讲的时候我开小差了吧(●’◡’●)）。</p>
+<p>在讲补码运算之前，先把补码范围的图放一下：<br><IMG SRC = https://s2.loli.net/2023/05/15/oAE2Th4SrXQgbpd.png></p>
+<p><FONT SIZE = 2 FACE = "楷体">请大家仔细阅读上面的这张图片，会更好的帮助你理解补码的表示。</FONT></p>
+<p>我又参考了一下国内的教材，好像是利用钟表这个比喻来解释补码是什么：</p>
+<p>个人参考了这篇博客，个人觉得讲的还是挺通俗的。（<a href="https://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html%EF%BC%89">https://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html）</a></p>
+<p>在CMU课堂上，老师利用了一个更容易理解的方式来告诉我们一个补码到底是如何表示一个负数，这里是我的一点总结，如果想学的更细的小伙伴可以去看<a herf = "https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click">CMU的原视频</a></p>
+<img src = https://s2.loli.net/2023/05/15/Uai2s9ynRPzEJxq.png>
+
+<p>当一个n位二进制数是以补码形式表示时，其最高位n已经不再表示为2^（n-1），而是表示为-（2^（n-1）），然后再进行转换。</p>
+<hr>
+<h3 id="4-unsigned和signed数字的处理"><a href="#4-unsigned和signed数字的处理" class="headerlink" title="4.unsigned和signed数字的处理"></a>4.unsigned和signed数字的处理</h3><p>Rules：在进行两个数的大小比较时，如果两个数的类型不一样（一个是signed，另一个是unsigned）那么要将符号数转化位无符号数再进行操作。</p>
+<p>这里利用一个小程序帮助大家进行理解：<br><IMG SRC = https://s2.loli.net/2023/05/15/t5ihFkmrE1cMlbe.png></p>
+<p>如果从我们大家理解的角度下看a&#x3D;-1，b&#x3D;0，在进行a &lt; b 的比较时，应该是返回1（表示正确的），但这里却显示为0。这里就很好的展示了unsigned和signed之间的转换。</p>
+<p>对于signed int a而言，其表示为1111 1111</p>
+<p>对于unsigned int b而言，其表示为0000 0000</p>
+<p>此时进行a、b之间的比较，因为他们类型不同，所以把signed int当成unsigned进行比较，很明显，此时对于a（1111 1111）是为unsigned int中的最大值。所以1111 1111 &lt; 0000 0000是错误的，所以返回值为0。</p>
+]]></content>
+      <categories>
+        <category>CSAPP</category>
+      </categories>
+      <tags>
+        <tag>CSAPP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello world</title>
+    <url>/2023/05/07/hello-world/</url>
+    <content><![CDATA[<table><tr><td bgcolor=#f7ff05><font size = 10 face ="黑体" color = "red">破壳第一天</font></td></tr></table>
+
+<p>欢迎来到<font size =4 color = "orange">KJ</font>的博客世界，我将会在这里更新有关于计算机的知识以及日常的生活，欢迎大家来看我的blog。</p>
+<h1 id="特别鸣谢："><a href="#特别鸣谢：" class="headerlink" title="特别鸣谢："></a><font size = 5 face = 楷体 color = red >特别鸣谢：</font></h1><p>标志设计来自：sea blue blue<br><img src = https://s2.loli.net/2023/05/09/qMPQ4ScXBnsJZoH.png></p>
+]]></content>
   </entry>
 </search>
