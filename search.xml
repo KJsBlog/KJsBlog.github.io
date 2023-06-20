@@ -167,7 +167,7 @@
 <h2 id="1-目的-："><a href="#1-目的-：" class="headerlink" title="1.目的 ："></a>1.目的 ：</h2><pre><code>    使前后free掉的chunk合并，空间的利用实现最大化。
 </code></pre>
 <h2 id="2-条件-："><a href="#2-条件-：" class="headerlink" title="2.条件 ："></a>2.条件 ：</h2><pre><code>1.在unsorted bins中,有两个物理相邻的free chunk(P和BK)，此时先free掉BK这一个chunk后，便触发unlink机制。
-2.要有如uaf的漏洞，能对chunk-P上的fd和bk指针进行修改。
+2.要有如uaf、offbyone等漏洞，能对chunk-P上的fd和bk指针进行修改。
 </code></pre>
 <h2 id="3-检测-："><a href="#3-检测-：" class="headerlink" title="3.检测 ："></a>3.检测 ：</h2><pre><code>unlink的检测很简单(这里的unlink检测指的是在unlink前的检测，不是检查是否能够进行unlink的检测)，总结下来就两步：
     1.检测BK.fd是否等于P的地址，既*(BK.fd)=*(&amp;BK+0x10)==&amp;P
@@ -219,18 +219,82 @@
 <p>到这里我们已经成功了绕过了unlink的检测，那么这个漏洞能让我们干什么大事呢？</p>
 <img src = https://s2.loli.net/2023/06/17/VX4PtmSb3F8o7YR.gif width =200>
 
+<p>下个博客更新细讲 .&lt;_&lt;.</p>
 ]]></content>
       <categories>
         <category>-pwn学习</category>
       </categories>
       <tags>
-        <tag>-pwn -堆利用</tag>
+        <tag>-pwn -堆利用 -unlink</tag>
       </tags>
   </entry>
   <entry>
-    <title>高数</title>
-    <url>/2023/06/18/%E9%AB%98%E6%95%B0/</url>
-    <content><![CDATA[<p>解压密码为：g405hun4n</p>
+    <title>堆基础</title>
+    <url>/2023/06/19/%E5%A0%86%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[<h1 id="堆基础复习"><a href="#堆基础复习" class="headerlink" title="堆基础复习"></a>堆基础复习</h1><p><font size = 2 face=楷体>本来是不因该有本篇博客的，但自从备考期末那段时间之后，对于堆的知识点有点忘记了，所以更新本篇，方便日后再复习。这里的绝大部分笔记都是来自我听课时做下的笔记。</font></p>
+<hr>
+<h2 id="1-堆管理器-Arena"><a href="#1-堆管理器-Arena" class="headerlink" title="1.堆管理器(Arena)"></a>1.堆管理器(Arena)</h2><p><font size =2 face =楷体>What is it：堆管理器并非由操作系统实现，而是由libc.so.6链接库实现。它封装了一些系统调用，为用户提供方便的动态内存分布接口的同时，力求高效地管理由系统调用申请来的内存。<br></font></p>
+<hr>
+<p><font size=5 face=宋体>Linux下的堆管理器：</font></p>
+<h3 id="申请内存的系统调用函数有："><a href="#申请内存的系统调用函数有：" class="headerlink" title="申请内存的系统调用函数有："></a>申请内存的系统调用函数有：</h3><p>1.brk函数(break)</p>
+<p>2.mmap(memory map：内存映射) mmap处既储存堆，也储存shared library</p>
+<font size =3 face =楷体>
+
+<p>主线程申请堆空间调用函数：brk、mmap</p>
+<p>子线程申请堆空间调用函数：mmap</p>
+</font>
+
+<hr>
+<h3 id="内存分配区"><a href="#内存分配区" class="headerlink" title="内存分配区"></a>内存分配区</h3><p>内存分配区，可以理解为堆管理器所持有的内存池。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">操作系统 ——&gt; 堆管理器 ——&gt; 用户</span><br><span class="line"></span><br><span class="line">物理内存 ——&gt;  arena  ——&gt; 可用内存</span><br></pre></td></tr></table></figure>
+<pre><code>堆管理器与用户的内存交易发生在arena中
+</code></pre>
+<p>内存分配区：可以理解为堆管理器像操作系统批发来的冗余的内存库存</p>
+<p>一个进程可以有多个arena，因为一个进程是由多个线程构成的。</p>
+<p>创造一个进程，操作系统会生成一个新的虚拟内存，并发配一个进程号(PID)，是分配资源的基本单位。</p>
+<hr>
+<h2 id="2-堆块-chunk"><a href="#2-堆块-chunk" class="headerlink" title="2.堆块(chunk)"></a>2.堆块(chunk)</h2><h3 id="chunk的结构"><a href="#chunk的结构" class="headerlink" title="chunk的结构"></a>chunk的结构</h3><p>用户申请内存的单位，也是堆管理器管理内存的基本单位。</p>
+<p>malloc()返回的指针指向一个chunk的数据区域</p>
+<img src=https://s2.loli.net/2023/06/19/bkKq3BaSePI5HtN.png>
+
+<p><img scr="https://smms.app/image/rWRSop76HKV5BAU" target="_blank"><img src="https://s2.loli.net/2023/06/19/rWRSop76HKV5BAU.png" alt="malloced chunk size指向.png"></p>
+<hr>
+<h3 id="free-chunk-的过程"><a href="#free-chunk-的过程" class="headerlink" title="free chunk 的过程"></a>free chunk 的过程</h3><img src = https://s2.loli.net/2023/06/19/3gyEDQcJSC6AxeM.png>
+
+<p>注意，这里只是把下一个chunk的prev-inuse位置改为0。并在bins链表加上该chunk的地址。并不是把内存清空。</p>
+<h3 id="prev-size的复用"><a href="#prev-size的复用" class="headerlink" title="prev size的复用"></a>prev size的复用</h3><p>prev size的复用：因为prev size是记录上一个chunk的大小值。如果上一个chunk是在使用之中的话，此时下一个chunk的prev size就没有作用了，所以系统为了节省空间，就会把这一个字节给利用上。</p>
+<p>所以：malloc(0xn8)和malloc(0xn0)所申请得到的两个chunk大小在使用时是一样的。</p>
+<h3 id="chunk的类型"><a href="#chunk的类型" class="headerlink" title="chunk的类型"></a>chunk的类型</h3><img src=https://s2.loli.net/2023/06/19/gqwxackF1TVGrp6.png>
+
+<h2 id="3-bins链表"><a href="#3-bins链表" class="headerlink" title="3.bins链表"></a>3.bins链表</h2><p>管理arena中空闲chunk的结构</p>
+<p>以数组的形式存在，数组元素为相对应大小的chunk链表的链表头。</p>
+<p>bins的类型有</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">· unsorted bins             </span><br><span class="line">· fast bins                 0x20~0x80</span><br><span class="line">· small bins</span><br><span class="line">· large bins</span><br><span class="line">· tcache</span><br></pre></td></tr></table></figure>
+
+<p>注意：free掉的chunk，如果是在0x20~0x80之间的先放在fastbins里，大于0x80的先放在unsorted bins中，等需要调用chunk时，系统先从unsorted bins中历遍，边寻找边把unsorted bins中的chunk分类</p>
+<p>fast bins结构：</p>
+<img src=https://s2.loli.net/2023/06/20/M3lKR6Z1ONdVYSf.png>
+
+<p>small bins结构：</p>
+<img src=https://s2.loli.net/2023/06/20/q5NtlJyDViSd1eg.png>
+
+<p>注意：fastbins为单链表存储。unsortedbin、smallbins、largebins都是双向循环链表存储。</p>
+]]></content>
+      <categories>
+        <category>-pwn学习</category>
+      </categories>
+      <tags>
+        <tag>-pwn -堆利用 -chunk结构</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>高等数学同济第七版书本+习题解析</title>
+    <url>/2023/06/18/%E9%AB%98%E7%AD%89%E6%95%B0%E5%AD%A6%E5%90%8C%E6%B5%8E%E7%AC%AC%E4%B8%83%E7%89%88%E4%B9%A6%E6%9C%AC+%E4%B9%A0%E9%A2%98%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<p>链接：<a href="https://pan.baidu.com/s/18G5K1HR9BSC-1rAasaovyA">https://pan.baidu.com/s/18G5K1HR9BSC-1rAasaovyA</a> </p>
+<p>提取码：gstn</p>
+<p>文件为zip文件</p>
+<p>解压密码为：g405hun4n</p>
+<p>资源仅供学习交流使用，请在参考后的24小时内删除，如有侵权请联系删除。</p>
 ]]></content>
       <categories>
         <category>-高数学习</category>
